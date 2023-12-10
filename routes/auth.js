@@ -20,7 +20,7 @@ router.get("/login", async (req, res) => {
 
                 newUserData(decodeValue, req, res);
             } else {
-                return res.send("User exists");
+                updateUserData(decodeValue, req, res)
             }
 
         }
@@ -49,6 +49,25 @@ const newUserData = async (decodeValue, req, res) => {
     } catch (error) {
         res.status(400).send({ success: false, msg: error });
     }
-}
+};
+
+const updateUserData = async (decodeValue, req, res) => {
+    const filter = { user_id: decodeValue.user_id };
+    const options = {
+        upsert: true,
+        new: true,
+    };
+
+    try {
+        const result = await user.findOneAndUpdate(
+            filter,
+            { auth_time: decodeValue.auth_time },
+            options
+        );
+        res.status(200).send({ user: result });
+    } catch (err) {
+        res.status(400).send({ success: false, msg: err });
+    }
+};
 
 module.exports = router;
